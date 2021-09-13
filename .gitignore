@@ -13,3 +13,13 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+# Development kit
+.idea/**
+.vscode/**
+../.idea/**
+../.vscode/**
+
+# log
+logs
+*.log
