@@ -23,3 +23,6 @@
 # log
 logs
 *.log
+
+# other file
+.DS_Store
