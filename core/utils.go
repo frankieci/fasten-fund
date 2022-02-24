@@ -1,8 +1,10 @@
-package common
+package core
 
 import (
 	"bytes"
 	"encoding/gob"
+	"reflect"
+	"runtime"
 )
 
 /**
@@ -16,4 +18,8 @@ func DeepCopy(dst, src interface{}) error {
 		return err
 	}
 	return gob.NewDecoder(bytes.NewBuffer(buf.Bytes())).Decode(dst)
+}
+
+func GetFunctionName(f interface{}) string {
+	return runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name()
 }
