@@ -2,7 +2,6 @@ package httpx
 
 import (
 	"log"
-	"net/http"
 	"net/url"
 	"testing"
 )
@@ -26,12 +25,8 @@ func TestClientDo(t *testing.T) {
 	}
 
 	log.Println(paramReq)
-	httrReq, err := http.NewRequest(method, urlPath.String(), nil)
-	if err != nil {
-		log.Fatalln(err)
-	}
 
-	resp, err := ClientDo(paramReq, httrReq, headers)
+	resp, err := ClientDo(method, urlPath.String(), paramReq, headers, nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
