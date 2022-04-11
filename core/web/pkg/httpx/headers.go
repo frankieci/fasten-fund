@@ -1,7 +1,7 @@
 package httpx
 
 import (
-	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 /**
@@ -28,7 +28,7 @@ const (
 )
 
 // SetHttpHeaders specifies http headers for user-defined
-func SetHttpHeaders(w gin.ResponseWriter, headers map[string]string) {
+func SetHttpHeaders(w http.ResponseWriter, headers map[string]string) {
 	for key, val := range headers {
 		w.Header().Add(key, val)
 	}
