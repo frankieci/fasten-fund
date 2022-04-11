@@ -2,10 +2,13 @@ package httpx
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"mime/multipart"
+	"net/http"
 	"net/url"
 	"os"
+	"time"
 )
 
 /**
@@ -18,7 +21,10 @@ func UploadFile(filePath string, urlPath url.URL, req interface{}) ([]byte, erro
 	bodyBuffer := &bytes.Buffer{}
 	bodyWriter := multipart.NewWriter(bodyBuffer)
 
-	fileWriter, _ := bodyWriter.CreateFormFile("file", "file.txt")
+	fileWriter, err := bodyWriter.CreateFormFile("file", "file.txt")
+	if err != nil {
+		return nil, err
+	}
 
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -42,4 +48,12 @@ func UploadFile(filePath string, urlPath url.URL, req interface{}) ([]byte, erro
 	}
 
 	return resp, nil
+}
+
+func DownloadFile(w http.ResponseWriter, r *http.Request) {
+	filename := fmt.Sprintf("file-record-%d.xlsx", time.Now().Unix())
+	SetHttpHeaders(w, GetFileHeaders(filename))
+	// data buffer
+	buf := new(bytes.Buffer)
+	http.ServeContent(w, r, filename, time.Now(), bytes.NewReader(buf.Bytes()))
 }
