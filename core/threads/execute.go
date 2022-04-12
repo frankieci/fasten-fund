@@ -12,6 +12,11 @@ import (
 func ExecuteFuncWithContext(timeout time.Duration, fn func() error) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
+
+	return GoFuncWithContext(ctx, fn)
+}
+
+func GoFuncWithContext(ctx context.Context, fn func() error) error {
 	successCh := make(chan struct{}, 0)
 	failedCh := make(chan error, 0)
 	defer func() { close(successCh); close(failedCh) }()

@@ -36,7 +36,7 @@ func UploadFile(filePath string, urlPath url.URL, req interface{}) ([]byte, erro
 		return nil, err
 	}
 
-	headers := map[string]interface{}{"Content-Type": bodyWriter.FormDataContentType()}
+	headers := map[string]interface{}{ContentType: bodyWriter.FormDataContentType()}
 
 	if err := bodyWriter.Close(); err != nil {
 		return nil, err
