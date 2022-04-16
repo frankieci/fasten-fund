@@ -47,10 +47,22 @@ type (
 
 var _ Element = Elements{}
 
+// Elements implements sort.Interface can be sorted by the routines in this sort package.
 type Elements []Element
 
 func (es Elements) Identify() interface{} {
 	return nil
+}
+
+func (es *Elements) Push(x interface{}) {
+	*es = append(*es, x.(Element))
+}
+
+func (es *Elements) Pop() interface{} {
+	old := *es
+	x := old[len(old)-1]
+	*es = old[:len(old)-1]
+	return x
 }
 
 // Group groups the Elements into different groups based on their keys.

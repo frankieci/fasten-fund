@@ -17,23 +17,20 @@ func ExecuteFuncWithContext(timeout time.Duration, fn func() error) error {
 }
 
 func GoFuncWithContext(ctx context.Context, fn func() error) error {
-	successCh := make(chan struct{}, 0)
-	failedCh := make(chan error, 0)
-	defer func() { close(successCh); close(failedCh) }()
+	fnCh := make(chan error, 0)
+	defer func() { close(fnCh) }()
 
 	go func() {
 		if err := fn(); err != nil {
-			failedCh <- err
+			fnCh <- err
 			return
 		}
-		successCh <- struct{}{}
+		fnCh <- nil
 	}()
 
 	select {
-	case err := <-failedCh:
+	case err := <-fnCh:
 		return err
-	case <-successCh:
-		return nil
 	case <-ctx.Done():
 		return ctx.Err()
 	}
