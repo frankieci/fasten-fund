@@ -1,0 +1,145 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+package apis/meta/v1 #DDDDDD {
+   interface NameObject {
+      +  GetName() string
+      +  SetName(name string)
+   }
+   interface NamespaceObject {
+      +  GetNamespace() string
+      +  SetNamespace(namespace string)
+   }
+   interface GenerationObject {
+      +  GetGenerateName() string
+      +  SetGenerateName(name string)
+      +  GetGeneration() int64
+      +  SetGeneration(generation int64)
+   }
+   interface UUIDObject {
+      +  GetUID() types.UID
+      +  SetUID(uid types.UID)
+   }
+   interface ResourceVersionObject {
+      +  GetResourceVersion() string
+      +  SetResourceVersion(version string)
+   }
+
+   interface LabelsObject {
+      +  GetLabels() map[string]string
+      +  SetLabels(labels map[string]string)
+   }
+
+   interface  AnnotationsObject {
+      +  GetAnnotations() map[string]string
+      +  SetAnnotations(annotations map[string]string)
+   }
+   interface SelfLinkObject {
+      +  GetSelfLink() string
+      +  SetSelfLink(selfLink string)
+   }
+   interface OperationTimestampObject {
+       +  GetCreationTimestamp() Time
+       +  SetCreationTimestamp(timestamp Time)
+       +  GetDeletionTimestamp() *Time
+       +  SetDeletionTimestamp(timestamp *Time)
+    }
+    interface GracePeriodSecondsObject {
+        +  GetDeletionGracePeriodSeconds() *int64
+        +  SetDeletionGracePeriodSeconds(*int64)
+    }
+
+    interface FinalizersObject {
+       +  GetFinalizers() []string
+       +  SetFinalizers(finalizers []string)
+    }
+    interface OwnerReferenceObject {
+       +  GetOwnerReferences() []OwnerReference
+       +  SetOwnerReferences([]OwnerReference)
+    }
+    interface ClusterNameObject {
+       +  GetClusterName() string
+       +  SetClusterName(clusterName string)
+    }
+    interface ManagedFieldsObject {
+     +  GetManagedFields() []ManagedFieldsEntry
+     +  SetManagedFields(managedFields []ManagedFieldsEntry)
+    }
+
+   interface Object {
+     NameObject
+     NamespaceObject
+     GenerationObject
+     UUIDObject
+     ResourceVersionObject
+     LabelsObject
+     AnnotationsObject
+     ManagedFieldsObject
+     ClusterNameObject
+     OwnerReferenceObject
+     FinalizersObject
+     GracePeriodSecondsObject
+     OperationTimestampObject
+     SelfLinkObject
+   }
+}
+
+package k8s.io/api/core/v1 #DDDDDD {
+  class Pod <<Object>> {
+    metav1.TypeMeta `json:",inline"`
+    metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
+    Spec PodSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
+    Status PodStatus `json:"status,omitempty" protobuf:"bytes,3,opt,name=status"`
+  }
+
+  class TypeMeta {
+    Kind string
+    APIVersion string
+  }
+  Pod -[hidden]- TypeMeta
+
+  class ObjectMeta {
+    Name string
+    GenerateName string
+    Namespace string
+    SelfLink string
+    UID types.UID
+    ResourceVersion string
+    Generation int64
+    CreationTimestamp Time
+    DeletionTimestamp *Time
+    DeletionGracePeriodSeconds *int64
+    Labels map[string]string
+    Annotations map[string]string
+    OwnerReferences []OwnerReference
+    Finalizers []string
+    ClusterName string
+    ManagedFields []ManagedFieldsEntry
+  }
+   Pod -[hidden]- ObjectMeta
+
+   class OwnerReference {
+     	APIVersion string
+     	Kind string
+     	Name string
+     	UID types.UID
+     	Controller *bool
+     	BlockOwnerDeletion *bool
+   }
+
+   ObjectMeta -[hidden]- OwnerReference
+
+   class ManagedFieldsEntry {
+   	Manager string
+   	Operation ManagedFieldsOperationType
+   	APIVersion string
+   	Time *Time
+   	FieldsType string
+   	FieldsV1 *FieldsV1
+   	Subresource string
+   }
+
+   ObjectMeta -[hidden]- ManagedFieldsEntry
+}
+
+@enduml
