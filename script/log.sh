@@ -8,6 +8,41 @@ set -o pipefail
 # Controls verbosity of the script output and logging.
 VERBOSE="${VERBOSE:-2}"
 
+# Print out some info that isn't a top level status line
+log::info() {
+  local V="${V:-0}"·
+  if [[ ${VERBOSE} < ${V} ]]; then
+    return
+  fi
+
+  local timestamp=$(date +"[%Y-%m-%d %H:%M:%S]")
+  for message; do
+    info "${timestamp} [INFO] ${message}"
+  done
+}
+
+log::warn() {
+  local timestamp=$(date +"[%Y-%m-%d %H:%M:%S]")
+  for message; do
+    warn "${timestamp} [WARN] ${message}"
+  done
+}
+
+# Log an error but keep going.  Don't dump the stack or exit.
+log::error() {
+  local timestamp=$(date +"[%Y-%m-%d %H:%M:%S]")
+  for message; do
+    error "${timestamp} [ERROR]  ${message}" >&2
+  done
+}
+
+log::debug() {
+  local timestamp=$(date +"[%Y-%m-%d %H:%M:%S]")
+  for message; do
+    debug "${timestamp} [DEBUG] ${message}"
+  done
+}
+
 # Handler for when we exit automatically on an error.
 # Borrowed from https://gist.github.com/ahendrix/7030300
 log::errexit() {
@@ -66,98 +101,17 @@ log::error_exit() {
   if [[ ${VERBOSE} -ge 4 ]]; then
     local source_file=${BASH_SOURCE[${stack_skip}]}
     local source_line=${BASH_LINENO[$((stack_skip - 1))]}
-    echo "!!! Error in ${source_file}:${source_line}" >&2
+    log::error "!!! Error in ${source_file}:${source_line}" >&2
     [[ -z ${1-} ]] || {
-      echo "  ${1}" >&2
+      log::error "  ${1}" >&2
     }
 
     log::stack ${stack_skip}
 
-    echo "Exiting with status ${code}" >&2
+    log::error "Exiting with status ${code}" >&2
   fi
 
   exit "${code}"
-}
-
-# Log an error but keep going.  Don't dump the stack or exit.
-log::error() {
-  local timestamp=$(date +"[%Y%m%d %H:%M:%S]")
-  for message; do
-    error "+++ ${timestamp} [ERROR]  ${message}" >&2
-  done
-}
-
-# Print an usage message to stderr.  The arguments are printed directly.
-log::usage() {
-  echo >&2
-  local message
-  local timestamp=$(date +"[%Y%m%d %H:%M:%S]")
-  for message; do
-    echo "+++ ${timestamp} [USAGE] ${message}" >&2
-  done
-  echo >&2
-}
-
-log::usage_from_stdin() {
-  local messages=()
-  while read -r line; do
-    messages+=("${line}")
-  done
-
-  log::usage "${messages[@]}"
-}
-
-# Print out some info that isn't a top level status line
-log::info() {
-  local V="${V:-0}"
-  if [[ ${VERBOSE} < ${V} ]]; then
-    return
-  fi
-
-  local timestamp=$(date +"[%Y%m%d %H:%M:%S]")
-  for message; do
-    info "+++ ${timestamp} [INFO] ${message}"
-  done
-}
-
-log::info_from_stdin() {
-  local messages=()
-  while read -r line; do
-    messages+=("${line}")
-  done
-
-  log::info "${messages[@]}"
-}
-
-# Print a status line.  Formatted to show up in a stream of output.
-log::status() {
-  local V="${V:-0}"
-  if [[ ${VERBOSE} < ${V} ]]; then
-    return
-  fi
-
-  local timestamp=$(date +"[%Y%m%d %H:%M:%S]")
-  for message; do
-    echo "+++ ${timestamp} [STATUS] ${1} ${message}"
-  done
-}
-
-log::debug() {
-  local timestamp=$(date +"[%Y%m%d %H:%M:%S]")
-  for message; do
-    debug "+++ ${timestamp} [DEBUG] ${message}"
-  done
-}
-
-log::warn() {
-  local timestamp=$(date +"[%Y%m%d %H:%M:%S]")
-  for message; do
-    warn "+++ ${timestamp} [WARN] ${message}"
-  done
-}
-
-function debug() {
-  echo -e "\033[37m${1}\033[0m" 
 }
 
 function info() {
@@ -170,4 +124,8 @@ function warn() {
 
 function error() {
   echo -e "\033[31m${1}\033[0m"
+}
+
+function debug() {
+  echo -e "\033[37m${1}\033[0m" 
 }

@@ -15,13 +15,11 @@
 # vendor/
 
 # Development kit
-.idea/**
-.vscode/**
-../.idea/**
-../.vscode/**
+.idea
+.vscode
+.venv
 
 # log
-logs
 *.log
 
 # other file
